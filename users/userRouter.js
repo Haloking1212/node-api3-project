@@ -2,11 +2,11 @@ const express = require('express');
 const Hubs = require("./userDb")
 const router = express.Router();
 
-router.post('/', (req, res) => {
+router.post('/', validateUser, (req, res) => {
   // do your magic!
   const { name } = req.body
   if(!name) {
-    return res.status(404).json({ message: "The post with the specifed ID does not exist." })
+    return res.status(404)
   }
   Hubs.insert(req.body)
   .then(hub => {
@@ -18,11 +18,11 @@ router.post('/', (req, res) => {
   })
 });
 
-router.post('/:id/posts', (req, res) => {
+router.post('/:id/posts', validatePost, (req, res) => {
   // do your magic!
   const { name } = req.body
   if(!name) {
-    return res.status(404).json({ message: "The post with the specifed ID does not exist." })
+    return res.status(404)
   }
   Hubs.insert(req.body)
   .then(hub => {
@@ -108,7 +108,6 @@ router.put('/:id', validateUserId, (req, res) => {
 
 function validateUserId(req, res, next) {
   // do your magic!
-  // const { id } = req.params;
   Hubs.getById(req.params.id)
   .then(hub => {
     if(req.params.id) {
@@ -128,10 +127,22 @@ function validateUserId(req, res, next) {
 
 function validateUser(req, res, next) {
   // do your magic!
+    if(req.body.name) {
+      res.status(200).json({ message: "Users post Validated" })
+      next()
+    } else {
+      next(new Error("Does not exist"));
+    }
 }
 
 function validatePost(req, res, next) {
   // do your magic!
+  if(req.body.text) {
+    res.status(200).json({ message: "Users post Validated" })
+    next()
+  } else {
+    next(new Error("Does not exist"));
+  }
 }
 
 module.exports = router;
